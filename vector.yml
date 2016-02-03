@@ -1,0 +1,16 @@
+---
+- hosts: matrix
+  sudo: true
+  vars:
+    - vector_path: /opt/vector/
+  tasks:
+    - name: Install packages
+      dnf: name={{item}} state=present
+      with_items:
+        - npm
+    - name: Check out vector
+      git:  dest="{{vector_path}}/app/" force=yes repo=git://github.com/tdfischer/vector-web version=master
+    - name: npm install
+      npm: path="{{vector_path}}/app/"
+    - name: npm run build
+      command: chdir="{{vector_path}}/app/" npm run build

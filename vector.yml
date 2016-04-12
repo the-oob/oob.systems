@@ -1,15 +1,23 @@
 ---
 - hosts: matrix
-  sudo: true
+  sudo: false
   vars:
     - vector_path: /opt/vector/
   tasks:
-    - name: Install packages
-      dnf: name={{item}} state=present
-      with_items:
-        - npm
+    - name: Check out matrix-js-sdk
+      git:  dest="{{vector_path}}/matrix-js-sdk/" force=yes repo=git://github.com/matrix-org/matrix-js-sdk version=develop
+    - name: npm install
+      npm: path="{{vector_path}}/matrix-js-sdk/"
+    - name: npm run build
+      command: chdir="{{vector_path}}/matrix-js-sdk/" npm run build
+    - name: Check out matrix-react-sdk
+      git:  dest="{{vector_path}}/matrix-react-sdk/" force=yes repo=git://github.com/matrix-org/matrix-react-sdk version=develop
+    - name: npm install
+      npm: path="{{vector_path}}/matrix-react-sdk/"
+    - name: npm run build
+      command: chdir="{{vector_path}}/matrix-react-sdk/" npm run build
     - name: Check out vector
-      git:  dest="{{vector_path}}/app/" force=yes repo=git://github.com/tdfischer/vector-web version=master
+      git:  dest="{{vector_path}}/app/" force=yes repo=git://github.com/tdfischer/vector-web version=oob
     - name: npm install
       npm: path="{{vector_path}}/app/"
     - name: npm run build

@@ -1,0 +1,58 @@
+# Prior to running this:
+# $ sudo dnf install python2-dnf
+---
+- hosts: matrix
+  sudo: true
+  vars:
+    - synapse_path: /opt/synapse/
+  vars_files:
+    - private/synapse.yml
+  tasks:
+    - name: Install packages
+      dnf: name={{item}} state=present
+      with_items:
+        - python-pip
+        - sqlite-devel
+        - python-virtualenv
+        - git
+        - libffi-devel
+        - gcc
+        - python-devel
+        - redhat-rpm-config
+        - libjpeg-turbo-devel
+        - libselinux-python
+        - pyOpenSSL
+        - python-gunicorn
+    - name: Create synapse user
+      user: name=synapse state=present comment="Matrix Synapse Homeserver" home={{synapse_path}} shell=/usr/sbin/nologin system=yes
+    - name: Create synapse directories
+      file: state=directory name={{item}} owner=synapse group=synapse
+      with_items:
+        - "{{synapse_path}}/git/"
+        - "{{synapse_path}}/virtualenv/"
+        - "{{synapse_path}}/config/"
+    - name: Clone synapse
+      git: depth=1 dest="{{synapse_path}}/git/" force=yes repo=git://github.com/matrix-org/synapse version=v0.12.0
+      tags:
+        - update
+      notify:
+        - Restart synapse
+    - name: Install synapse to virtualenv
+      pip: name="file://{{synapse_path}}/git/" virtualenv="{{synapse_path}}/virtualenv/"
+      tags:
+        - update
+      notify:
+        - Restart synapse
+    - name: Install synapse start.sh
+      copy: src=synapse-start.sh dest="{{synapse_path}}/start.sh" mode=0755
+    - name: Install synapse.service
+      copy: src=synapse.service dest=/usr/lib/systemd/system/synapse.service
+    - name: Configure synapse
+      template: src=homeserver.yaml dest="{{synapse_path}}/config/homeserver.yaml"
+      notify:
+        - Restart synapse
+    - name: Enable synapse
+      service: name=synapse state=started
+  handlers:
+    - name: Restart synapse
+      service: name=synapse state=restarted

@@ -1,0 +1,13 @@
+[Unit]
+Name=synapse
+Description=Synapse Matrix.org Homeserver
+
+[Service]
+ExecStart=/opt/synapse/start.sh
+User=synapse
+Group=synapse
+
+[Install]
+WantedBy=multi-user.target
+Wants=network.target
+Wants=nginx.service

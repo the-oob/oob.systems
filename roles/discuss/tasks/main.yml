@@ -1,0 +1,36 @@
+---
+- name: Update discourse_docker tool
+  git: repo=git://github.com/discourse/discourse_docker.git dest=/var/discourse
+  notify:
+    - rebuild discourse
+- name: Install discourse container configuration
+  copy: src=docker-container.yml dest=/var/discourse/containers/app.yml
+  notify:
+    - rebuild discourse
+- name: Install SSL cert
+  copy: src=private/discuss.oob.systems.cer dest=/var/discourse/shared/standalone/ssl/discuss.oob.systems.cer
+  notify:
+    - restart discourse
+- name: Install SSL key
+  copy: src=private/discuss.oob.systems.key dest=/var/discourse/shared/standalone/ssl/discuss.oob.systems.key
+  notify:
+    - restart discourse
+
+- name: Configure postfix master.cf map
+  copy: src=master.cf dest=/etc/postfix/master.cf
+  notify:
+    - restart postfix
+- name: Configure postfix transport map
+  copy: src=transport dest=/etc/postfix/transport
+  notify:
+    - rebuild transport map
+- name: Configure postfix
+  copy: src=main.cf dest=/etc/postfix/main.cf
+  notify:
+    - restart postfix
+- name: Configure mail aliases
+  copy: src=aliases dest=/etc/aliases
+  notify:
+    - restart postfix
+- name: Configure postfix SASL
+  copy: src=sasl.conf dest=/etc/postfix/sasl/smtpd.conf

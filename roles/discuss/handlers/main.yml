@@ -1,0 +1,14 @@
+---
+- name: rebuild discourse
+  command: chdir=/var/discourse env SMTP_PASSWORD="{{discourse_smtp_password}}" SLACK_HOOK_URL="{{discourse_slack_hook_url}}"./launcher rebuild app
+  notify:
+    - restart discourse
+- name: Restart discourse
+  command: chdir=/var/discourse env ./launcher restart app
+
+- name: restart postfix
+  service: name=postfix state=restarted enabled=yes
+- name: rebuild transport map
+  command: postmap -v /etc/postfix/transport
+  notify:
+    - restart postfix

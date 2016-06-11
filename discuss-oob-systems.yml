@@ -1,0 +1,7 @@
+---
+- hosts: discuss
+  user: root
+  vars_files:
+    - private/discourse-docker.yml
+  roles:
+    - discuss

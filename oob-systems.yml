@@ -1,0 +1,7 @@
+---
+- hosts: matrix
+  become: true
+  vars:
+    - spacewiki_path: /opt/spacewiki/
+  roles:
+    - wiki

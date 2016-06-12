@@ -1,0 +1,26 @@
+- name: Install packages
+  dnf: name="{{item}}" state=present
+  with_items:
+    - rubygem-sass
+    - pngcrush
+    - gifsicle
+    - uglify-js
+- name: Create spacewiki user
+  user: name=spacewiki state=present comment="Spacewiki" home={{spacewiki_path}} shell=/usr/sbin/nologin system=yes
+- name: Create spacewiki directories
+  file: state=directory name="{{spacewiki_path}}/app/" owner=spacewiki group=spacewiki
+- name: clone spacewiki
+  git: dest="{{spacewiki_path}}/app/" force=yes repo=git://github.com/tdfischer/spacewiki version=170767701704e50797fedd3251116bcb50953602
+- name: Setup spacewiki virtualenv
+  pip: requirements="{{spacewiki_path}}/app/requirements.txt" virtualenv="{{spacewiki_path}}/virtualenv/"
+- name: Install gunicorn
+  pip: name=gunicorn virtualenv="{{spacewiki_path}}/virtualenv/"
+- name: Build spacewiki
+  shell: chdir="{{spacewiki_path}}/app/" source "{{spacewiki_path}}/virtualenv/bin/activate" && make
+  become_user: spacewiki
+- name: Configure spacewiki
+  copy: src=local_settings.py dest="{{spacewiki_path}}/app/spacewiki/local_settings.py"
+- name: Install spacewiki.service
+  copy: src=spacewiki.service dest=/usr/lib/systemd/system/spacewiki.service
+- name: Enable spacewiki
+  service: name=spacewiki state=started

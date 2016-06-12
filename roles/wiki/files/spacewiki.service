@@ -1,0 +1,13 @@
+[Unit]
+Name=spacewiki
+Description=Spacewiki gunicorn
+
+[Service]
+ExecStart=/opt/spacewiki/virtualenv/bin/gunicorn wsgi
+User=spacewiki
+Group=spacewiki
+WorkingDirectory=/opt/spacewiki/app
+
+[Install]
+WantedBy=multi-user.target
+Wants=nginx.service

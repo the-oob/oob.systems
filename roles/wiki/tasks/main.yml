@@ -10,11 +10,14 @@
 - name: Create spacewiki directories
   file: state=directory name="{{spacewiki_path}}/app/" owner=spacewiki group=spacewiki
 - name: clone spacewiki
-  git: dest="{{spacewiki_path}}/app/" force=yes repo=git://github.com/tdfischer/spacewiki version=170767701704e50797fedd3251116bcb50953602
+  git: dest="{{spacewiki_path}}/app/" force=yes repo=git://github.com/tdfischer/spacewiki version=origin/oob
+  become_user: spacewiki
 - name: Setup spacewiki virtualenv
   pip: requirements="{{spacewiki_path}}/app/requirements.txt" virtualenv="{{spacewiki_path}}/virtualenv/"
+  become_user: spacewiki
 - name: Install gunicorn
   pip: name=gunicorn virtualenv="{{spacewiki_path}}/virtualenv/"
+  become_user: spacewiki
 - name: Build spacewiki
   shell: chdir="{{spacewiki_path}}/app/" source "{{spacewiki_path}}/virtualenv/bin/activate" && make
   become_user: spacewiki

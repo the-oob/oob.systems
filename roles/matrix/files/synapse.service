@@ -3,9 +3,10 @@ Name=synapse
 Description=Synapse Matrix.org Homeserver
 
 [Service]
-ExecStart=/opt/synapse/start.sh
+ExecStart=/opt/synapse/virtualenv/bin/python -m synapse.app.homeserver -c homeserver.yaml --server-name=oob.systems
 User=synapse
 Group=synapse
+WorkingDirectory=/opt/synapse/config
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,2 @@
+- name: Restart synapse
+  service: name=synapse state=restarted

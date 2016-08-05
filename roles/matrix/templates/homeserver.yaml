@@ -214,7 +214,7 @@ report_stats: False
 
 
 # A list of application service config file to use
-app_service_config_files: []
+app_service_config_files: ['/opt/synapse/config/irc-appservice.yaml']
 
 
 ## Signing Keys ##

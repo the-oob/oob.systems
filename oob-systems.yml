@@ -3,5 +3,14 @@
   become: true
   vars:
     - spacewiki_path: /opt/spacewiki/
+    - synapse_path: /opt/synapse/
+  vars_files:
+    - private/synapse.yml
   roles:
     - wiki
+    - matrix
+  tasks:
+    - name: Configure nginx
+      copy: src=nginx.conf dest=/etc/nginx/conf.d/oob.systems.conf
+    - name: Enable nginx
+      service: name=nginx state=started

@@ -65,8 +65,6 @@ env:
   ## If you added the Lets Encrypt template, uncomment below to get a free SSL certificate
   LETSENCRYPT_ACCOUNT_EMAIL: tdfischer@hackerbots.net
 
-  SLACK_HOOK_URL: "$SLACK_HOOK_URL"
-
   ## The CDN address for this Discourse instance (configured to pull)
   ## see https://meta.discourse.org/t/14857 for details
   #DISCOURSE_CDN_URL: //discourse-cdn.example.com
@@ -85,17 +83,16 @@ volumes:
 hooks:
   after_code:
     - exec:
-        cd: $home
-        cmd:
-          - git remote add oob git://github.com/the-oob/discourse.git
-          - git fetch oob
-          - git config --global user.email root@oob.systems
-          - git merge oob/oob
-    - exec:
         cd: $home/plugins
         cmd:
-          - git clone https://github.com/discourse/docker_manager.git
-          - git clone https://github.com/tdfischer/discourse-slack-plugin slack
+          - git clone git://github.com/discourse/docker_manager.git
+          - git clone git://github.com/tdfischer/discourse-slack-plugin.git
+          - git clone git://github.com/tdfischer/discourse-twitter-plugin.git
+    - exec:
+        cd: $home
+        cmd:
+          - echo "gem 'twitter', '5.16.0'" >> Gemfile
+          - bundle install --no-deployment
 
 ## Any custom commands to run after building
 run:

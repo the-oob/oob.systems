@@ -1,6 +1,6 @@
 ---
 - name: rebuild discourse
-  command: chdir=/var/discourse env SMTP_PASSWORD="{{discourse_smtp_password}}" SLACK_HOOK_URL="{{discourse_slack_hook_url}}"./launcher rebuild app
+  command: chdir=/var/discourse env SMTP_PASSWORD="{{discourse_smtp_password}}" ./launcher rebuild app
   notify:
     - restart discourse
 - name: Restart discourse
